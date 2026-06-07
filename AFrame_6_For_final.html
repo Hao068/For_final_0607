@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>MindAR A~E Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+/* 播放按鈕 */
+#playBtn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+
+    padding: 12px 24px;
+    font-size: 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #4CAF50;
+    color: white;
+
+    display: none;
+}
+
+/* 警告 */
+#warningMsg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+
+    background: rgba(0,0,0,0.85);
+    color: white;
+
+    padding: 20px 30px;
+    border-radius: 12px;
+
+    font-size: 20px;
+    display: none;
+}
+
+/* 成功訊息 */
+#successMsg {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+
+    background: black;
+    color: gold;
+
+    padding: 15px 35px;
+    border-radius: 12px;
+
+    font-size: 32px;
+
+    font-family: "STHupo", Arial, sans-serif;
+
+    white-space: nowrap;
+
+    text-align: center;
+
+    display: none;
+
+    border: 2px solid gold;
+}
+</style>
+</head>
+
+<body>
+
+<button id="playBtn">▶ 播放影片與聲音</button>
+
+<div id="warningMsg">
+請注意手機音量<br>
+避免影響他人
+</div>
+
+<div id="successMsg"></div>
+
+<a-scene
+mindar-image="imageTargetSrc: targets_all.mind; autoStart: true; uiScanning: true"
+vr-mode-ui="enabled: false">
+
+<a-assets>
+    <video id="videoA" src="A_Apple.mp4" playsinline webkit-playsinline></video>
+    <video id="videoB" src="B_Ball.mp4" playsinline webkit-playsinline></video>
+    <video id="videoC" src="C_Car.mp4" playsinline webkit-playsinline></video>
+    <video id="videoD" src="D_Dog.mp4" playsinline webkit-playsinline></video>
+    <video id="videoE" src="E_Elephant.mp4" playsinline webkit-playsinline></video>
+</a-assets>
+
+<a-camera></a-camera>
+
+<!-- A~E targets -->
+<a-entity mindar-image-target="targetIndex: 0">
+    <a-video src="#videoA" width="2.4" height="2.4"></a-video>
+</a-entity>
+
+<a-entity mindar-image-target="targetIndex: 1">
+    <a-video src="#videoB" width="2.4" height="2.4"></a-video>
+</a-entity>
+
+<a-entity mindar-image-target="targetIndex: 2">
+    <a-video src="#videoC" width="2.4" height="2.4"></a-video>
+</a-entity>
+
+<a-entity mindar-image-target="targetIndex: 3">
+    <a-video src="#videoD" width="2.4" height="2.4"></a-video>
+</a-entity>
+
+<a-entity mindar-image-target="targetIndex: 4">
+    <a-video src="#videoE" width="2.4" height="2.4"></a-video>
+</a-entity>
+
+</a-scene>
+
+<script>
+
+const playBtn = document.querySelector('#playBtn');
+const warningMsg = document.querySelector('#warningMsg');
+const successMsg = document.querySelector('#successMsg');
+
+const videos = [
+    document.querySelector('#videoA'),
+    document.querySelector('#videoB'),
+    document.querySelector('#videoC'),
+    document.querySelector('#videoD'),
+    document.querySelector('#videoE')
+];
+
+let currentIndex = 0;
+
+/* target事件 */
+document.querySelectorAll('[mindar-image-target]').forEach((el, index) => {
+
+    el.addEventListener('targetFound', () => {
+        currentIndex = index;
+        playBtn.style.display = 'block';
+    });
+
+    el.addEventListener('targetLost', () => {
+
+        videos[index].pause();
+        videos[index].currentTime = 0;
+
+        playBtn.style.display = 'none';
+        warningMsg.style.display = 'none';
+        successMsg.style.display = 'none';
+    });
+
+});
+
+/* 播放按鈕 */
+playBtn.addEventListener('click', () => {
+
+    playBtn.style.display = 'none';
+    warningMsg.style.display = 'block';
+
+    setTimeout(() => {
+
+        warningMsg.style.display = 'none';
+
+        const v = videos[currentIndex];
+        v.currentTime = 0;
+        v.play();
+
+    }, 2000);
+
+});
+
+/* 播放結束 */
+videos.forEach(v => {
+
+    v.addEventListener('ended', () => {
+
+        const msg = Math.random() > 0.5 ? "Good Job!" : "Well Done!";
+
+        successMsg.innerHTML = msg;
+        successMsg.style.display = 'block';
+
+        setTimeout(() => {
+            successMsg.style.display = 'none';
+        }, 6000);
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
